@@ -49,13 +49,10 @@ public class SwedenIdNumber implements IdNumberGenerator {
         return isYearOver100YearsAgo(date.toString().substring(0, 4), LocalDate.now()) ? "+" : "-";
     }
 
-    private String generateEndPart(BaseProviders f) {
+    public static String generateEndPart(BaseProviders f) {
         return "%03d".formatted(f.number().numberBetween(1, 1000));
     }
 
-    /**
-     * @deprecated Use method {@link #generateInvalid(BaseProviders)} instead
-     */
     @Deprecated
     public String getInvalidSsn(BaseProviders f) {
         return generateInvalid(f);
@@ -65,11 +62,15 @@ public class SwedenIdNumber implements IdNumberGenerator {
     public String generateInvalid(BaseProviders f) {
         String candidate = "121212-1212"; // Seed with a valid number
         while (isValidSwedishSsn(candidate)) {
-            String pattern = f.options().option(VALID_PATTERNS);
+            String pattern = getPattern(f);
             candidate = f.numerify(pattern);
         }
 
         return candidate;
+    }
+
+    private String getPattern(BaseProviders faker) {
+        return faker.options().option(VALID_PATTERNS);
     }
 
     public static boolean isValidSwedishSsn(String ssn) {
